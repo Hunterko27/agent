@@ -5,7 +5,9 @@
 
 const APP_BASE = 'https://stockscanner123.netlify.app';
 const SCORE_THRESHOLD = 80;
-const DELAY_BETWEEN_CALLS_MS = 1500; // be gentle on the free-tier data API
+const DELAY_BETWEEN_CALLS_MS = 3000; // be gentle on the free-tier data API
+const MAX_RETRIES = 2;
+const RETRY_DELAY_MS = 8000;
 
 const DISCORD_WEBHOOK_URL = process.env.DISCORD_WEBHOOK_URL;
 
@@ -21,10 +23,16 @@ async function fetchLists() {
   return [...combined];
 }
 
-async function scanSymbol(symbol) {
+async function scanSymbol(symbol, attempt = 1) {
   const res = await fetch(`${APP_BASE}/api/scan?symbol=${encodeURIComponent(symbol)}`);
   const data = await res.json();
+
   if (!res.ok) {
+    if (data.isRateLimit && attempt <= MAX_RETRIES) {
+      console.warn(`  ! ${symbol}: rate limited, retrying in ${RETRY_DELAY_MS / 1000}s (attempt ${attempt}/${MAX_RETRIES})`);
+      await sleep(RETRY_DELAY_MS);
+      return scanSymbol(symbol, attempt + 1);
+    }
     console.warn(`  ! ${symbol}: ${data.error || res.status}`);
     return null;
   }
