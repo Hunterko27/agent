@@ -4,10 +4,8 @@ on:
   schedule:
     # All times UTC. Runs Mon-Fri only ("1-5" = Monday-Friday).
     # Tuned to US market hours at GMT+2 (open 15:30, close 22:00 GMT+2 = 13:30-20:00 UTC):
-    # ~15 min after open, midday, and ~15 min before close.
-    - cron: '45 13 * * 1-5'
-    - cron: '30 16 * * 1-5'
-    - cron: '45 19 * * 1-5'
+    # runs hourly at :30 past, from market open through close.
+    - cron: '30 13-19 * * 1-5'
   workflow_dispatch: {} # lets you manually trigger a run from the Actions tab, for testing
 
 jobs:
@@ -25,4 +23,4 @@ jobs:
       - name: Run stock scan
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
-        run: node agent/check-stocks.js
+        run: node check-stocks.js
