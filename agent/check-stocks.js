@@ -6,8 +6,8 @@
 const APP_BASE = 'https://stockscanner123.netlify.app';
 const SCORE_THRESHOLD = 80;
 const DELAY_BETWEEN_CALLS_MS = 3000; // be gentle on the free-tier data API
-const MAX_RETRIES = 2;
-const RETRY_DELAY_MS = 8000;
+const MAX_RETRIES = 3;
+const RETRY_DELAY_MS = 10000;
 
 const DISCORD_WEBHOOK_URL = process.env.DISCORD_WEBHOOK_URL;
 
